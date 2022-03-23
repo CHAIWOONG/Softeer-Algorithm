@@ -16,7 +16,6 @@ int main(int argc, char** argv)
 	cin.tie(0); cout.tie(0);
 	
 	cin>>n; 
-	//int ACmint = INT_MAX, BDmint = INT_MAX;
 	int mint = INT_MAX;
 
 	for(int i=1; i<=n; i++){
@@ -32,11 +31,11 @@ int main(int argc, char** argv)
 	int tmpt = mint; // 시뮬레이션 시작 시간의 설정
 
 	while(1){
-		int ACflag=0, BDflag=0;
-		int Aflag=0, Bflag=0, Cflag=0, Dflag=0;
+		int ACflag=0, BDflag=0; // A-C, B-D는 같은 시간내에서 동시에 진행이 가능하다
+		int Aflag=0, Bflag=0, Cflag=0, Dflag=0; // 각 도로별 못움직인 상황의 확인
 
 		int minqt = INT_MAX;
-		for(int i=0; i<4; i++){
+		for(int i=0; i<4; i++){ // 시간 초과 방지를 위해서 현재의 tmpt와 queue에 남아있는 최소 시간을 비교해서 업데이트 
 			if(q[i].empty()) continue;
 			minqt = min(minqt, q[i].front());
 		}
@@ -44,7 +43,7 @@ int main(int argc, char** argv)
 
 		for(int i=0; i<4; i+=2){ // A와 C에 대해 동시확인
 
-			if(q[i].empty()) continue;
+			if(q[i].empty()) continue; // 비어있으면 제외
 			int headCar = q[i].front();
 
 			if(headCar>tmpt) continue; // 아직 들어온 차가 아니므로 제외
@@ -55,23 +54,23 @@ int main(int argc, char** argv)
 				if(q[rRoad].empty()){ // 오른쪽이 비어있으면 그냥 지나가면 된다.
 					q[i].pop();
 					inputq[i].push(tmpt);
-					ACflag=1;
+					ACflag=1; // AC 변화 발생 check
 					continue;
 				}
 				// 비어있지 않은 경우,
 				if(q[rRoad].front()<=tmpt){  // 오른쪽 차량이 우선순위이므로
-					if(i==0) Aflag=1; // A 못감
-					else Cflag=1;
+					if(i==0) Aflag=1; // A 못감 check
+					else Cflag=1; // C 못감 check 
 					continue;
 				}
 				else if(q[rRoad].front()>tmpt){ // 오른쪽에 차량이 아직 안들어온 차량이면
 					q[i].pop();
 					inputq[i].push(tmpt);
-					ACflag=1;
+					ACflag=1; // AC 변화 발생 check
 				}
 			}
 		}
-		if(ACflag) tmpt++;
+		if(ACflag) tmpt++; // A와 C의 도로중에 변화가 생겼으면 시간을 증가
 	
 		for(int i=1; i<4; i+=2){ // B와 D에 대해 동시확인
 
@@ -91,7 +90,7 @@ int main(int argc, char** argv)
 				}
 
 				if(q[rRoad].front()<=tmpt){  // 오른쪽 차량이 우선순위이므로
-					if(i==1) Dflag=1; // A 못감
+					if(i==1) Dflag=1; 
 					else Bflag=1;
 					continue;
 				}
@@ -102,8 +101,8 @@ int main(int argc, char** argv)
 				}
 			}
 		}
-		if(BDflag) tmpt++;
-		else if(ACflag==0 && BDflag==0) tmpt++; // 둘다 안움직였으면 시간 일단 흐름
+		if(BDflag) tmpt++; // B와 D의 도로중에 변화가 생겼으면 시간을 증가
+		else if(ACflag==0 && BDflag==0) tmpt++; // 둘다 안움직였지만 시간 일단 흐르게 한다
 
 		if(q[0].empty()&&q[1].empty()&&q[2].empty()&&q[3].empty()) break; // 전부 비었으면 종료
 		if(Aflag==1 && Bflag==1 && Cflag==1 && Dflag==1) break; // 전부 교착상태
